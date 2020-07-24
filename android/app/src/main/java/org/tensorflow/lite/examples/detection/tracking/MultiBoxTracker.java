@@ -29,6 +29,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,6 +112,10 @@ public class MultiBoxTracker {
     languageMap.put("airplane", "avion");
     languageMap.put("bus", "bus");
     languageMap.put("train", "train");
+    languageMap.put("laptop", "portable");
+    languageMap.put("wine", "du vin");
+    languageMap.put("oven", "four");
+    languageMap.put("chair", "chaise");
   }
 
   public synchronized void setFrameConfiguration(
@@ -160,16 +165,12 @@ public class MultiBoxTracker {
             (int) (multiplier * (rotated ? frameWidth : frameHeight)),
             sensorOrientation,
             false);
-    // canvas.rotate(90, 500, 300);
+    ArrayList<String> seen = new ArrayList<String>();
     for (final TrackedRecognition recognition : trackedObjects) {
       final RectF trackedPos = new RectF(recognition.location);
-
       getFrameToCanvasMatrix().mapRect(trackedPos);
       boxPaint.setColor(recognition.color);
-
       float cornerSize = Math.min(trackedPos.width(), trackedPos.height()) / 8.0f;
-      canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);    // Don't draw the box
-
       final String labelString =
           !TextUtils.isEmpty(recognition.title)
               ? String.format("%s %.2f", recognition.title, (100 * recognition.detectionConfidence))
@@ -178,15 +179,23 @@ public class MultiBoxTracker {
 //       labelString);
       String cleanLabelString = cropProb(labelString);
       // This is the very drawing line
-      borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top, cleanLabelString); //text:labelString + "%", boxPaint
-//      String aha = languageMap.get(cleanLabelString);
-//      borderedText.drawText(canvas, trackedPos.left + cornerSize, 100, aha);
-      canvas.save();
+      if (!seen.contains(cleanLabelString)) {
+        seen.add(cleanLabelString);
+        borderedText.drawText(canvas, 1200, trackedPos.top, cleanLabelString); //text:labelString + "%", boxPaint
+        if (languageMap.containsKey(cleanLabelString)) {
+          canvas.drawRoundRect(trackedPos, cornerSize, cornerSize, boxPaint);    // Don't draw the box
+          String translate = languageMap.get(cleanLabelString);
+          borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top, translate);
+        }
+      }
 //      Paint paint = new Paint();
 //      paint.setStyle(Paint.Style.FILL);
-//
-//      canvas.save();
-//      // canvas.translate(100, 200);
+//      paint.setStyle(Paint.Style.STROKE);
+//      paint.setStrokeWidth(1);
+//      paint.setColor(Color.WHITE);
+//      paint.setTextSize(30);
+//      canvas.drawText("" + cleanLabelString, 0, 0, paint);
+      canvas.save();
 //
 //      // draw some text using STROKE style
 //      paint.setStyle(Paint.Style.STROKE);
