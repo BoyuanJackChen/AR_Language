@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme.ObjectDetection" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#3C99FD</item>
+        <item name="colorPrimaryDark">#5378FF</item>
+        <item name="colorAccent">@color/tfe_color_accent</item>
+    </style>
+
+</resources>
