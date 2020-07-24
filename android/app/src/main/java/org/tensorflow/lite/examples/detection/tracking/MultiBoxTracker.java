@@ -25,6 +25,7 @@ import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 
@@ -43,6 +44,11 @@ public class MultiBoxTracker {
   private static final float TEXT_SIZE_DIP = 21;    // The size of output
   private static final float MIN_SIZE = 16.0f;
   private static final int[] COLORS = {
+          Color.BLUE,
+          Color.BLUE,
+          Color.BLUE,
+          Color.BLUE,
+          Color.BLUE,
     Color.BLUE,
           Color.CYAN,
           Color.GREEN,
@@ -70,6 +76,7 @@ public class MultiBoxTracker {
   private int frameWidth;
   private int frameHeight;
   private int sensorOrientation;
+  private Map<String, String> languageMap;
 
   public MultiBoxTracker(final Context context) {
     for (final int color : COLORS) {
@@ -88,6 +95,22 @@ public class MultiBoxTracker {
         TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP, context.getResources().getDisplayMetrics());
     borderedText = new BorderedText(textSizePx);
+    // TFLiteObjectDetectionAPIModel: skateboard
+    languageMap = new HashMap<>();
+    languageMap.put("person", "personne");
+    languageMap.put("dog", "chien");
+    languageMap.put("cell", "téléphone");
+    languageMap.put("bottle", "bouteille");
+    languageMap.put("mouse", "souris");
+    languageMap.put("donut", "donus");
+    languageMap.put("bird", "oiseau");
+    languageMap.put("cat", "chat");
+    languageMap.put("cup", "tasse");
+    languageMap.put("bicycle", "vélo");
+    languageMap.put("car", "voiture");
+    languageMap.put("airplane", "avion");
+    languageMap.put("bus", "bus");
+    languageMap.put("train", "train");
   }
 
   public synchronized void setFrameConfiguration(
@@ -123,17 +146,6 @@ public class MultiBoxTracker {
   private Matrix getFrameToCanvasMatrix() {
     return frameToCanvasMatrix;
   }
-
-  Map<String, String> m = new HashMap<String, String>() {
-    {
-      put("person", "personne");
-      put("dog", "chien");
-    }
-  };
-//  m.put("person", "personne");
-//  m.put("dog", "chien");
-//  m.put("cell", "téléphone");
-//  m.put("bottle", "bouteille");
   public synchronized void draw(final Canvas canvas) {
     final boolean rotated = sensorOrientation % 180 == 90;
     final float multiplier =
@@ -166,8 +178,9 @@ public class MultiBoxTracker {
 //       labelString);
       String cleanLabelString = cropProb(labelString);
       // This is the very drawing line
-      borderedText.drawText(canvas, trackedPos.top + cornerSize, trackedPos.top, cleanLabelString); //text:labelString + "%", boxPaint
-      borderedText.drawText(canvas, 500, 100, m.get(cleanLabelString));
+      borderedText.drawText(canvas, trackedPos.left + cornerSize, trackedPos.top, cleanLabelString); //text:labelString + "%", boxPaint
+//      String aha = languageMap.get(cleanLabelString);
+//      borderedText.drawText(canvas, trackedPos.left + cornerSize, 100, aha);
       canvas.save();
 //      Paint paint = new Paint();
 //      paint.setStyle(Paint.Style.FILL);
